@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jejerish Store</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <meta name="description" content="Jejerish Foot Wear - Simple Online Store" />
+</head>
+<body>
+  <nav>
+    <div class="container navbar">
+      <a class="brand" href="./index.html"><span class="logo"></span> Jejerish Store</a>
+      <div class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./cart.html">Cart <span class="badge" data-cart-count>0</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="hero">
+      <div class="panel">
+        <div>
+          <h1>Comfort-first footwear, built for Tanzania 👣</h1>
+          <p>Quality sandals and accessories at friendly prices. Pay on delivery available (demo).</p>
+          <div class="cta">
+            <a class="btn primary" href="#shop">Shop now</a>
+            <a class="btn" href="./cart.html">View cart</a>
+          </div>
+        </div>
+        <div class="card">
+          <div class="thumb"><img src="./assets/sandal1.svg" alt="Sandal"/></div>
+          <div class="body">
+            <div class="title">Jejerish Sandal Classic</div>
+            <div class="meta">Best seller • in stock</div>
+            <div class="row" style="justify-content:space-between; align-items:center;">
+              <div class="price">TZS 26,000</div>
+              <button class="btn primary" id="hero-add">Add to cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="shop">
+      <h2>Products</h2>
+      <div class="grid" id="product-grid"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© <span id="year"></span> Jejerish Foot Wear — Demo store (no real payments).</div>
+  </footer>
+
+  <script src="./app.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    loadProducts().then(items => {
+      const grid = document.getElementById('product-grid');
+      items.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="thumb"><img src="./assets/${p.img}" alt="${p.name}"></div>
+          <div class="body">
+            <div class="title">${p.name}</div>
+            <div class="meta">${p.category} • ${p.stock} in stock</div>
+            <div class="row" style="justify-content:space-between; align-items:center;">
+              <div class="price">${currency(p.price, p.unit)}</div>
+              <button class="btn primary" data-add="${p.id}">Add</button>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+      grid.addEventListener('click', (e) => {
+        const id = e.target.getAttribute('data-add');
+        if (!id) return;
+        const product = items.find(x => x.id === id);
+        addToCart(product, 1);
+      });
+      // Hero quick add: first item
+      const hero = items[0];
+      document.getElementById('hero-add').addEventListener('click', () => addToCart(hero, 1));
+    });
+  </script>
+</body>
+</html>

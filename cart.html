@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Cart — Jejerish Store</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <nav>
+    <div class="container navbar">
+      <a class="brand" href="./index.html"><span class="logo"></span> Jejerish Store</a>
+      <div class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./cart.html">Cart <span class="badge" data-cart-count>0</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="section">
+      <h2>Shopping Cart</h2>
+      <table class="table" id="cart-table">
+        <thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="total">
+        <div><strong>Total:</strong></div>
+        <div id="total-val">TZS 0</div>
+      </div>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+        <a class="btn" href="./index.html">Continue shopping</a>
+        <a class="btn primary" href="./checkout.html">Checkout</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© <span id="year"></span> Jejerish Foot Wear — Demo store.</div>
+  </footer>
+
+  <script src="./app.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    function render() {
+      const tbody = document.querySelector('#cart-table tbody');
+      tbody.innerHTML = '';
+      const cart = getCart();
+      cart.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="display:flex; align-items:center; gap:10px">
+            <img src="./assets/${item.img}" alt="${item.name}" style="width:54px; height:54px; border-radius:10px; border:1px solid var(--border);" />
+            ${item.name}
+          </td>
+          <td>${currency(item.price, item.unit)}</td>
+          <td>
+            <div class="qty">
+              <button data-dec="${item.id}">-</button>
+              <input type="number" min="1" value="${item.qty}" data-qty="${item.id}" />
+              <button data-inc="${item.id}">+</button>
+            </div>
+          </td>
+          <td>${currency(item.price * item.qty, item.unit)}</td>
+          <td><button class="btn" data-del="${item.id}">Remove</button></td>`;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('total-val').textContent = currency(cartTotal());
+      renderCartBadge();
+    }
+    document.addEventListener('click', e => {
+      if (e.target.hasAttribute('data-inc')) {
+        const id = e.target.getAttribute('data-inc'); const cart = getCart();
+        const it = cart.find(i => i.id===id); it.qty++; setCart(cart); render();
+      }
+      if (e.target.hasAttribute('data-dec')) {
+        const id = e.target.getAttribute('data-dec'); const cart = getCart();
+        const it = cart.find(i => i.id===id); it.qty = Math.max(1, it.qty-1); setCart(cart); render();
+      }
+      if (e.target.hasAttribute('data-del')) {
+        removeFromCart(e.target.getAttribute('data-del')); render();
+      }
+    });
+    document.addEventListener('input', e => {
+      if (e.target.hasAttribute('data-qty')) {
+        const id = e.target.getAttribute('data-qty'); updateQty(id, parseInt(e.target.value||'1',10)); render();
+      }
+    });
+    render();
+  </script>
+</body>
+</html>

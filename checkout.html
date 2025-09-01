@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Jejerish Store</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <nav>
+    <div class="container navbar">
+      <a class="brand" href="./index.html"><span class="logo"></span> Jejerish Store</a>
+      <div class="nav-links">
+        <a href="./index.html">Home</a>
+        <a href="./cart.html">Cart <span class="badge" data-cart-count>0</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <section class="section">
+      <h2>Checkout</h2>
+      <p class="badge">Demo only — no real payments.</p>
+      <div class="grid" style="grid-template-columns: 1.2fr 0.8fr;">
+        <div class="card">
+          <div class="body">
+            <form id="checkout-form">
+              <div class="form-grid">
+                <div>
+                  <label>Full Name</label>
+                  <input type="text" required id="name" placeholder="Enter your full name" />
+                </div>
+                <div>
+                  <label>Phone</label>
+                  <input type="tel" required id="phone" placeholder="+255 ..." />
+                </div>
+                <div>
+                  <label>Email (optional)</label>
+                  <input type="email" id="email" placeholder="you@example.com" />
+                </div>
+                <div>
+                  <label>City/Town</label>
+                  <input type="text" required id="city" placeholder="Dar es Salaam" />
+                </div>
+                <div style="grid-column: 1 / -1;">
+                  <label>Address</label>
+                  <input type="text" required id="address" placeholder="Street and house number" />
+                </div>
+              </div>
+              <div style="margin-top:12px; display:flex; gap:10px; justify-content:flex-end;">
+                <a class="btn" href="./cart.html">Back to Cart</a>
+                <button class="btn primary" type="submit">Place Order</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="card">
+          <div class="body">
+            <div class="title">Order Summary</div>
+            <table class="table" id="summary"></table>
+            <div class="total"><div><strong>Total:</strong></div><div id="sum-total">TZS 0</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">© <span id="year"></span> Jejerish Foot Wear — Demo store.</div>
+  </footer>
+
+  <script src="./app.js"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+    function renderSummary() {
+      const table = document.getElementById('summary');
+      const cart = getCart();
+      table.innerHTML = '<tr><th>Item</th><th>Qty</th><th>Total</th></tr>';
+      cart.forEach(i => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = \`<td>\${i.name}</td><td>\${i.qty}</td><td>\${currency(i.price * i.qty, i.unit)}</td>\`;
+        table.appendChild(tr);
+      });
+      document.getElementById('sum-total').textContent = currency(cartTotal());
+      renderCartBadge();
+    }
+    renderSummary();
+
+    document.getElementById('checkout-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const cart = getCart();
+      if (cart.length === 0) { alert('Your cart is empty.'); return; }
+      const order = {
+        items: cart, total: cartTotal(),
+        customer: {
+          name: document.getElementById('name').value.trim(),
+          phone: document.getElementById('phone').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          city: document.getElementById('city').value.trim(),
+          address: document.getElementById('address').value.trim(),
+        },
+        createdAt: new Date().toISOString()
+      };
+      // In a real app, send this to a server:
+      // fetch('/api/orders', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(order) });
+      console.log('Order placed (demo):', order);
+      alert('Order placed! (demo) — check console for details.');
+      localStorage.removeItem('cart');
+      window.location.href = './index.html';
+    });
+  </script>
+</body>
+</html>
